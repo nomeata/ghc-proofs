@@ -2,6 +2,7 @@
 {-# LANGUAGE CPP #-}
 module GHC.Proof.Plugin (plugin) where
 
+import Prelude hiding ((<>))
 import Data.Maybe
 import Control.Monad
 import System.Exit
@@ -118,18 +119,19 @@ simplify guts more_in_scope expr = do
     let rule_env = RuleEnv rule_base2 vis_orphs
     let in_scope = bindersOfBinds (mg_binds guts) ++ more_in_scope
 
-    (expr', _) <- liftIO $ initSmpl dflags' rule_env emptyFamInstEnvs us sz $ do
-            return expr >>= simplExpr (simplEnv in_scope 4) . occurAnalyseExpr
-                        >>= simplExpr (simplEnv in_scope 4) . occurAnalyseExpr
-                        >>= simplExpr (simplEnv in_scope 3) . occurAnalyseExpr
-                        >>= simplExpr (simplEnv in_scope 3) . occurAnalyseExpr
-                        >>= simplExpr (simplEnv in_scope 2) . occurAnalyseExpr
-                        >>= simplExpr (simplEnv in_scope 2) . occurAnalyseExpr
-                        >>= simplExpr (simplEnv in_scope 2) . occurAnalyseExpr
-                        >>= simplExpr (simplEnv in_scope 1) . occurAnalyseExpr . cseOneExpr'
-                        >>= simplExpr (simplEnv in_scope 1) . occurAnalyseExpr . cseOneExpr'
-                        >>= simplExpr (simplEnv in_scope 0) . occurAnalyseExpr . cseOneExpr'
-                        >>= simplExpr (simplEnv in_scope 0) . occurAnalyseExpr . cseOneExpr'
+    (expr', _) <- liftIO $ initSmpl dflags' rule_env emptyFamInstEnvs us sz $
+            return expr
+                >>= simplExpr (simplEnv in_scope 4 dflags') . occurAnalyseExpr
+                >>= simplExpr (simplEnv in_scope 4 dflags') . occurAnalyseExpr
+                >>= simplExpr (simplEnv in_scope 3 dflags') . occurAnalyseExpr
+                >>= simplExpr (simplEnv in_scope 3 dflags') . occurAnalyseExpr
+                >>= simplExpr (simplEnv in_scope 2 dflags') . occurAnalyseExpr
+                >>= simplExpr (simplEnv in_scope 2 dflags') . occurAnalyseExpr
+                >>= simplExpr (simplEnv in_scope 2 dflags') . occurAnalyseExpr
+                >>= simplExpr (simplEnv in_scope 1 dflags') . occurAnalyseExpr . cseOneExpr'
+                >>= simplExpr (simplEnv in_scope 1 dflags') . occurAnalyseExpr . cseOneExpr'
+                >>= simplExpr (simplEnv in_scope 0 dflags') . occurAnalyseExpr . cseOneExpr'
+                >>= simplExpr (simplEnv in_scope 0 dflags') . occurAnalyseExpr . cseOneExpr'
     return expr'
 
 #if  __GLASGOW_HASKELL__ >= 801
@@ -138,12 +140,15 @@ cseOneExpr' = cseOneExpr
 cseOneExpr' = id
 #endif
 
-simplEnv :: [Var] -> Int -> SimplEnv
-simplEnv vars p = env1
+simplEnv :: [Var] -> Int -> DynFlags -> SimplEnv
+simplEnv vars p dflags = env1
   where
     env1 = addNewInScopeIds env0 vars
     env0 =  mkSimplEnv $ SimplMode { sm_names = ["GHC.Proof"]
                                    , sm_phase = Phase p
+#if  __GLASGOW_HASKELL__ >= 804
+                                   , sm_dflags = dflags
+#endif
                                    , sm_rules = True
                                    , sm_inline = True
                                    , sm_eta_expand = True
@@ -170,11 +175,11 @@ proofPass guts = do
         liftIO $ exitFailure -- kill the compiler. Is there a nicer way?
 
 occurPass :: PluginPass
-occurPass mg@(ModGuts { mg_module = this_mod
+occurPass mg@ModGuts { mg_module = this_mod
                             , mg_rdr_env = rdr_env
                             , mg_deps = deps
                             , mg_binds = binds, mg_rules = rules
-                            , mg_fam_inst_env = fam_inst_env })
+                            , mg_fam_inst_env = fam_inst_env }
  = do let binds' = occurAnalysePgm this_mod (const True) rules [] emptyVarSet  binds
       return mg
 

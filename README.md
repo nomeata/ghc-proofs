@@ -30,8 +30,7 @@ GHC.Proof: Proving my_proof1 …
 GHC.Proof proved 1 equalities
 ```
 
-See the [`examples/`](examples/) directory for more examples of working proofs
-(with GHC HEAD).
+See the [`examples/`](examples/) directory for more examples of working proofs.
 
 If you have proof that GHC cannot prove, for example
 
@@ -90,6 +89,7 @@ Why is this so great?
  * Using rewrite rules allows proofs with regard to some theory (e.g. with
    regard to equations about `foldr` and other list combinators), independent
    of whether these are proven.
+ * It works with the 8.2 and 8.4 versions of the GHC compiler.
 
 Why is this not so great?
 --------------------
@@ -102,9 +102,7 @@ Why is this not so great?
  * There is no guarantee that the next GHC release will be able to prove the
    same things.
  * Failed proofs are reported in GHC Core instead of Haskell.
- * At least currently, it more or less requires GHC HEAD (it compiles with
-   GHC-8.0, but it has less control over the simplifier and less proofs will go
-   through.)
+ * It doesn't (yet?) work with GHC versions 8.6 or higher.
 
 What can it prove?
 ------------------
@@ -243,4 +241,3 @@ Can I comment or help?
 
 Sure! We can use the GitHub issue tracker for discussions, and obviously
 contributions are welcome.
-

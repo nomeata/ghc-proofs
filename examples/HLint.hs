@@ -1,4 +1,5 @@
-{-# LANGUAGE BangPatterns, ScopedTypeVariables, AllowAmbiguousTypes, TypeApplications #-}
+{-# LANGUAGE BangPatterns, ScopedTypeVariables, AllowAmbiguousTypes,
+    TypeApplications, CPP #-}
 {-# OPTIONS_GHC -O -fplugin GHC.Proof.Plugin #-}
 
 -- This modules explores which rules from hlint-1.9.41 we can prove with
@@ -239,10 +240,18 @@ proof48 x = (x `seq` x == []) =/= null x
 proof49 x = (\x -> [x]) === (:[])
 
 -- warn = map (uncurry f) (zip x y) ==> zipWith f x y
+#if  __GLASGOW_HASKELL__ >= 804
+proof50 f x y = map (uncurry f) (zip x y) === zipWith f x y
+#else
 proof50 f x y = map (uncurry f) (zip x y) =/= zipWith f x y
+#endif
 
 -- hint = map f (zip x y) ==> zipWith (curry f) x y where _ = isVar f
+#if  __GLASGOW_HASKELL__ >= 804
+proof51 f x y = map f (zip x y) === zipWith (curry f) x y
+#else
 proof51 f x y = map f (zip x y) =/= zipWith (curry f) x y
+#endif
 
 -- warn = not (elem x y) ==> notElem x y
 proof52 x y = not (elem x y) === notElem x y
@@ -257,7 +266,7 @@ proof54 x y = x ++ concatMap (' ':) y =/= unwords (x:y)
 proof55 x = intercalate " " x =/= unwords x
 
 -- hint = concat (intersperse x y) ==> intercalate x y where _ = notEq x " "
-proof56 x y = concat (intersperse x y) =/= intercalate x y 
+proof56 x y = concat (intersperse x y) =/= intercalate x y
 
 -- hint = concat (intersperse " " x) ==> unwords x
 proof57 x = concat (intersperse " " x) =/= unwords x

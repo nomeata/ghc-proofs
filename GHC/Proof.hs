@@ -47,7 +47,7 @@
 -- *   Define proof obligations using the 'proof' function or, equilvalently, the
 --     '===' operator. Type signatures are optional.
 --
---     These proof obligation must occur direclty on the
+--     These proof obligation must occur directly on the
 --     right-hand side of a top-level definition, where all parameters (if any)
 --     are plain variables. For example, this would (currently) not work:
 --
