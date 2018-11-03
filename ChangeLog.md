@@ -1,5 +1,9 @@
 # Revision history for ghc-proofs
 
+## 0.1.3  -- 2018-11-03
+
+* Support GHC 8.6 compiler versions
+
 ## 0.1.2  -- 2018-11-02
 
 * Support GHC 8.4 compiler versions
