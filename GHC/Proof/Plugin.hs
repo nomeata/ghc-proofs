@@ -174,12 +174,19 @@ proofPass guts = do
         errorMsg $ text "GHC.Proof could not prove all equalities"
         liftIO $ exitFailure -- kill the compiler. Is there a nicer way?
 
+#if  __GLASGOW_HASKELL__ >= 806
+occurPass :: CorePluginPass
+#else
 occurPass :: PluginPass
+#endif
 occurPass mg@ModGuts { mg_module = this_mod
                             , mg_rdr_env = rdr_env
                             , mg_deps = deps
                             , mg_binds = binds, mg_rules = rules
                             , mg_fam_inst_env = fam_inst_env }
+#if  __GLASGOW_HASKELL__ >= 806
+ = do let binds' = occurAnalysePgm this_mod (const True) (const True) rules binds
+#else
  = do let binds' = occurAnalysePgm this_mod (const True) rules [] emptyVarSet  binds
+#endif
       return mg
-

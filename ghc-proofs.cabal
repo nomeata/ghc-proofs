@@ -1,5 +1,5 @@
 name:                ghc-proofs
-version:             0.1.2
+version:             0.1.3
 synopsis:            GHC plugin to prove program equations by simplification
 description:         Often when writing Haskel code, one would like to prove things about the code.
                      .
@@ -25,7 +25,7 @@ copyright:           2017 Joachim Breitner
 build-type:          Simple
 extra-source-files:  ChangeLog.md, README.md
 cabal-version:       >=1.10
-Tested-With:         GHC == 8.2.2, GHC == 8.4.3
+Tested-With:         GHC == 8.2.2, GHC == 8.4.4, GHC == 8.6.2
 
 source-repository head
   type:     git
@@ -34,8 +34,8 @@ source-repository head
 library
   exposed-modules:     GHC.Proof
                        GHC.Proof.Plugin
-  build-depends:       base >=4.9 && <4.12
-  build-depends:       ghc >= 8.2 && <8.5
+  build-depends:       base >=4.9 && <4.13
+  build-depends:       ghc >= 8.2 && <8.7
   default-language:    Haskell2010
 
 test-suite successors
@@ -43,7 +43,7 @@ test-suite successors
   hs-source-dirs:      examples
   main-is:             Successors.hs
   build-depends:       ghc-proofs
-  build-depends:       base >=4.9 && <4.12
+  build-depends:       base >=4.9 && <4.13
   default-language:    Haskell2010
   ghc-options:         -main-is Successors
 
@@ -52,7 +52,7 @@ test-suite hlint
   hs-source-dirs:      examples
   main-is:             HLint.hs
   build-depends:       ghc-proofs
-  build-depends:       base >=4.9 && <4.12
+  build-depends:       base >=4.9 && <4.13
   build-depends:       transformers
   default-language:    Haskell2010
   ghc-options:         -main-is HLint
